@@ -34,7 +34,7 @@ h2 {
 #colvis-container {
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: right;
     gap: 8px;
 }
 
