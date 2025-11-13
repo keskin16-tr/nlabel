@@ -4,41 +4,8 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.bootstrap5.min.css"/>
-<style>
-    /* Sütun filtreleme input'ları için özel stil */
-    .filter-input {
-        width: 100%; 
-        box-sizing: border-box; 
-        padding: 4px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 0.85rem; /* Yazı boyutunu küçült */
-    }
-    
-    /* Tablo ve genel içerik için yazı boyutunu küçültme */
-    #data_table, .alert, h2 {
-        font-size: 0.9rem; /* Genel yazı boyutunu küçült */
-    }
-    
-    h2 {
-        font-size: 1.5rem !important; /* Başlığı çok küçültmemek için */
-    }
+<link rel="stylesheet" href="{{ url_for('static', filename='css/table_view.css') }}">
 
-    /* Tablo kapsayıcısını kenarlara yaslamak ve ortalamayı kaldırmak için: */
-    /* dataTables.bootstrap5.css zaten .dataTables_wrapper'ı tam genişlik yapar,
-       bu yüzden .container'daki varsayılan max-width'i aşan bir genişlik tanımlamıyoruz. 
-       .table-responsive içinde olduğu için taşınmaz. */
-
-    /* DataTables başlık ve altbilgi kutucuklarını da küçültmek için */
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_paginate {
-        font-size: 0.85rem;
-    }
-
-</style>
 {% endblock %}
 
 {% block content %}
