@@ -84,3 +84,35 @@ h2 {
         padding: 3px;
     }
 }
+/* Sütunları Göster/Gizle butonunu sağa hizala */
+#colvis-container {
+    display: flex;
+    justify-content: flex-end;  /* sağa yasla */
+    align-items: center;
+    margin-left: auto;          /* d-flex içinde sağa iter */
+}
+
+/* DataTables butonlarının stilini küçült ve sadeleştir */
+#colvis-container .btn {
+    font-size: 0.8rem;          /* Yazı boyutu */
+    padding: 4px 10px;          /* Daha ince padding */
+    border-radius: 4px;
+    white-space: nowrap;        /* Satır kaymasını engelle */
+}
+
+/* Yazı boyutlarını genel olarak küçült */
+#data_table,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_paginate {
+    font-size: 0.85rem !important;
+}
+
+/* Başlık ve uyarı boyutları */
+h2 {
+    font-size: 1.4rem !important;
+}
+.alert {
+    font-size: 0.85rem;
+}
