@@ -1,6 +1,6 @@
 /* static/css/table.css */
 
-/* Sütun filtreleme input'ları için özel stil */
+/* Filtre inputları */
 .filter-input {
     width: 100%;
     box-sizing: border-box;
@@ -8,10 +8,10 @@
     margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 0.85rem; /* Yazı boyutunu küçült */
+    font-size: 0.85rem;
 }
 
-/* Tablo ve genel içerik için yazı boyutunu küçültme */
+/* Genel yazı boyutları */
 #data_table,
 .alert,
 h2 {
@@ -19,89 +19,10 @@ h2 {
 }
 
 h2 {
-    font-size: 1.5rem !important; /* Başlığı çok küçültmemek için */
+    font-size: 1.4rem !important;
 }
 
-/* DataTables bilgilendirme, filtreleme ve sayfalama kısımları */
-.dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dataTables_paginate {
-    font-size: 0.85rem;
-}
-
-/* "Sütunları Göster/Gizle" butonunu sola hizala */
-#colvis-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: right;
-    gap: 8px;
-}
-
-/* DataTables butonları arasındaki boşluk */
-.dt-buttons .btn {
-    margin-right: 6px;
-}
-
-/* Tablo genel görünümü */
-#data_table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-/* Checkbox sütunu genişliği ayarı */
-#data_table th:first-child,
-#data_table td:first-child {
-    width: 32px;
-    text-align: center;
-}
-
-/* Bootstrap alert mesajlarını biraz sadeleştir */
-.alert {
-    padding: 8px 12px;
-    border-radius: 4px;
-}
-
-/* Hover efekti */
-.table-hover tbody tr:hover {
-    background-color: #f2f2f2;
-}
-
-/* Sayfalama ve bilgi kısmı alt hizalı dursun */
-.dataTables_wrapper .dataTables_paginate {
-    margin-top: 5px;
-}
-
-/* Responsive tablo kapsayıcısı */
-.table-responsive {
-    overflow-x: auto;
-}
-
-/* Mobilde filtre inputlarının daha düzgün görünmesi için */
-@media (max-width: 768px) {
-    .filter-input {
-        font-size: 0.8rem;
-        padding: 3px;
-    }
-}
-/* Sütunları Göster/Gizle butonunu sağa hizala */
-#colvis-container {
-    display: flex;
-    justify-content: flex-end;  /* sağa yasla */
-    align-items: center;
-    margin-left: auto;          /* d-flex içinde sağa iter */
-}
-
-/* DataTables butonlarının stilini küçült ve sadeleştir */
-#colvis-container .btn {
-    font-size: 0.8rem;          /* Yazı boyutu */
-    padding: 4px 10px;          /* Daha ince padding */
-    border-radius: 4px;
-    white-space: nowrap;        /* Satır kaymasını engelle */
-}
-
-/* Yazı boyutlarını genel olarak küçült */
-#data_table,
+/* DataTables bilgi, sayfalama ve uzunluk menüsü */
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter,
@@ -109,10 +30,58 @@ h2 {
     font-size: 0.85rem !important;
 }
 
-/* Başlık ve uyarı boyutları */
-h2 {
-    font-size: 1.4rem !important;
+/* ✅ Butonların ikisini de sola hizala */
+.d-flex.justify-content-between {
+    justify-content: flex-start !important; /* Sağ-sol arası boşluğu kaldır, sola hizala */
+    gap: 8px; /* Aralarına boşluk bırak */
 }
-.alert {
-    font-size: 0.85rem;
+
+/* Sütunları Göster/Gizle buton grubu */
+#colvis-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 6px; /* butonlar arası boşluk */
+}
+
+/* DataTables "Sütunları Göster/Gizle" butonu */
+#colvis-container .btn {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* Yazdır butonu da aynı oranda küçülsün */
+.btn-success.btn-sm {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+/* Tablo stilleri */
+#data_table th:first-child,
+#data_table td:first-child {
+    width: 32px;
+    text-align: center;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Mobil görünümde biraz küçült */
+@media (max-width: 768px) {
+    .filter-input {
+        font-size: 0.8rem;
+        padding: 3px;
+    }
+
+    .btn, #colvis-container .btn {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
 }
