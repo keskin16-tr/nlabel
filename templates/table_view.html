@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Veri Tablosu{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap3.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.bootstrap3.min.css"/>
+<style>
+    /* Sütun filtreleme input'ları için özel stil */
+    .filter-input {
+        width: 100%; 
+        box-sizing: border-box; 
+        padding: 4px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">2. Etiketlenecek Veri Tablosu</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="alert alert-info" role="alert">
+    **Gelişmiş Filtreleme:** Artık her sütunun altındaki kutucuktan ayrı ayrı filtreleme yapabilirsiniz. Örneğin, 'Marka' sütununa 'Philips' yazıp filtreledikten sonra, 'Model' sütununa 'MX' yazıp sadece MX modellerini görebilirsiniz.
+</div>
+
+<form method="POST" action="{{ url_for('table_view') }}">
+    <div class="d-flex justify-content-between mb-3">
+        <button type="submit" class="btn btn-success" {% if not template_set %}disabled{% endif %}>
+            <i class="bi bi-printer"></i> Seçilen {{ 'Satırları' if template_set else 'Satırları Seçin ve Şablonu Ayarlayın' }} Yazdırmaya Hazırla
+        </button>
+        <div id="colvis-container" class="btn-group"></div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="data_table" class="table table-striped table-hover table-sm" style="width:100%">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select_all"></th>
+                    {% for col in columns %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th> {% for col in columns %}
+                    <th><input type="text" placeholder="{{ col }} filtrele" class="filter-input" data-column-index="{{ loop.index }}"></th>
+                    {% endfor %}
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td><input type="checkbox" name="selected_rows_checkbox" value="{{ loop.index0 }}"></td>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
+<script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // DataTables'i başlat
+        var table = $('#data_table').DataTable({
+            order: [], 
+            columnDefs: [
+                { orderable: false, targets: 0 }, // Checkbox sıralanamaz
+                { searchable: false, targets: 0 }, // Checkbox aranamaz
+                { searchable: true, targets: '_all' } // Diğer tüm sütunlar aranabilir
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/tr.json" 
+            },
+            layout: {
+                topStart: '', // DataTables'ın varsayılan arama kutusunu kaldır
+                topEnd: {
+                    buttons: [
+                        {
+                            extend: 'colvis',
+                            text: 'Sütunları Göster/Gizle',
+                            className: 'btn btn-outline-secondary'
+                        }
+                    ]
+                },
+                bottomEnd: 'info',
+                bottomStart: 'paging'
+            }
+        });
+
+        // Sütun Gizleme düğmesini özel bir yere taşı
+        table.buttons().container().appendTo('#colvis-container');
+        
+        // DataTables'ın varsayılan genel arama kutusunu gizle
+        $('#data_table_filter').hide();
+
+
+        // SÜTUN BAZLI FİLTERELEME İŞLEVİ
+        $('.filter-input').on('keyup change', function() {
+            var columnIndex = $(this).data('column-index'); // 1'den başlar (Checkbox hariç)
+            
+            // DataTables'da index 0'dan başladığı için, checkbox'ı da hesaba katmalıyız:
+            // DataTables index'i: column-index (1)
+            var dt_column_index = columnIndex; 
+            
+            // DataTables arama API'sini kullan:
+            table.column(dt_column_index)
+                .search(this.value, false, true) // Değer, regex kapalı, akıllı arama açık
+                .draw();
+                
+            // Not: DataTables'ın üstteki genel arama kutusunun aksine, 
+            // sütun bazlı aramalar birbirini daraltır (Excel gibi).
+        });
+        
+        // DataTables draw event'i (filtreleme, sıralama, sayfa değişimi sonrası)
+        // Checkbox durumlarını korumak ve güncellemek için
+        var selectedRows = new Set(); // Global Set (sayfa değişimlerinde durumu korur)
+
+        $('#data_table tbody').on('change', 'input[type="checkbox"][name="selected_rows_checkbox"]', function(){
+            var value = $(this).val();
+            if(this.checked){
+                selectedRows.add(value);
+            } else {
+                selectedRows.delete(value);
+            }
+            updatePrintButton();
+            updateSelectAllCheckbox();
+        });
+        
+        $('#select_all').on('click', function(){
+            var isChecked = this.checked;
+            // Visible (görünür) olan satırlar üzerinde döngü
+            table.rows({search: 'applied', page: 'current'}).nodes().to$().find('input[type="checkbox"][name="selected_rows_checkbox"]').each(function(){
+                this.checked = isChecked;
+                var value = $(this).val();
+                if (isChecked) {
+                    selectedRows.add(value);
+                } else {
+                    selectedRows.delete(value);
+                }
+            });
+            updatePrintButton();
+        });
+        
+        function updateSelectAllCheckbox() {
+            var visibleCheckboxes = table.rows({search: 'applied', page: 'current'}).nodes().to$().find('input[type="checkbox"][name="selected_rows_checkbox"]');
+            var checkedCount = visibleCheckboxes.filter(':checked').length;
+            $('#select_all').prop('checked', checkedCount > 0 && checkedCount === visibleCheckboxes.length);
+            $('#select_all').prop('indeterminate', checkedCount > 0 && checkedCount < visibleCheckboxes.length);
+        }
+
+        // Form gönderilirken sadece seçilen satırları gönder
+        $('form').on('submit', function(e){
+            $('input[name="selected_rows"]').remove();
+            selectedRows.forEach(function(rowValue){
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'selected_rows',
+                    value: rowValue
+                }).appendTo('form');
+            });
+        });
+        
+        // Yazdırma düğmesinin durumunu güncelle
+        function updatePrintButton() {
+            var button = $('.btn-success[type="submit"]');
+            var templateIsSet = {{ 'true' if template_set else 'false' }};
+            
+            if (selectedRows.size > 0 && templateIsSet) {
+                button.prop('disabled', false);
+                button.html('<i class="bi bi-printer"></i> Seçilen ' + selectedRows.size + ' Satırı Yazdırmaya Hazırla');
+            } else if (templateIsSet) {
+                button.prop('disabled', true); 
+                button.html('<i class="bi bi-printer"></i> Seçilen Satırları Yazdırmaya Hazırla');
+            } else {
+                 button.prop('disabled', true);
+                 button.html('<i class="bi bi-printer"></i> Şablonu Ayarlayın');
+            }
+        }
+        updatePrintButton();
+        
+        // Sayfa değişimi ve filtreleme sonrası checkbox durumlarını yenile
+        table.on('draw', function () {
+            // Görünür olan tüm checkboxları gez
+            table.rows({page: 'current'}).nodes().to$().find('input[type="checkbox"][name="selected_rows_checkbox"]').each(function(){
+                var value = $(this).val();
+                // Eğer bu satır Set'te seçiliyse, kutucuğu işaretle
+                this.checked = selectedRows.has(value);
+            });
+            updateSelectAllCheckbox();
+        });
+        
+    });
+</script>
+{% endblock %}
