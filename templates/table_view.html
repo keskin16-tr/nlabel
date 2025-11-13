@@ -107,7 +107,38 @@
 
         // Sütun Gizleme düğmesini özel bir yere taşı
         table.buttons().container().appendTo('#colvis-container');
-        
+        // DataTables sonrası: colvis'in kesin yerini ayarla
+$(document).ready(function() {
+    // ... senin mevcut DataTable init kodun burada olsun ...
+
+    // küçük gecikme ile (butonlar oluşturulduktan sonra) colvis container'ı yazdır butonunun yanına taşı
+    setTimeout(function(){
+        // 1) Eğer yazdır butonu varsa, colvis'i onun yanına ekle
+        var $printBtn = $('.btn-success.btn-sm').first();
+        var $colvis = $('#colvis-container');
+
+        if ($printBtn.length && $colvis.length) {
+            // colvis'i yazdır butonundan hemen sonra ekle (solda beraber görünürler)
+            $printBtn.after($colvis);
+            // wrapper div'in layout sınıflarını temizle (justify-content-between kaldır)
+            var $wrapper = $printBtn.closest('.d-flex.justify-content-between');
+            if ($wrapper.length) {
+                $wrapper.removeClass('justify-content-between').addClass('align-items-center');
+            }
+        } else {
+            // alternatik: doğrudan parent'a append et
+            $('.d-flex.align-items-center.mb-3').first().prepend($colvis);
+        }
+
+        // zorlayıcı stil ekle
+        $colvis.css({
+            'display': 'inline-flex',
+            'margin-left': '6px',
+            'justify-content': 'flex-start'
+        });
+    }, 100); // 100ms yeterli; istersen 200 yap
+});
+
         // DataTables'ın varsayılan genel arama kutusunu gizle
         $('#data_table_filter').hide();
 
