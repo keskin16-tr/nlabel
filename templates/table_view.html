@@ -13,6 +13,27 @@
         margin-top: 5px;
         border: 1px solid #ccc;
         border-radius: 4px;
+        font-size: 0.85rem; /* Yazı boyutunu küçült */
+    }
+    /* Tablo ve genel içerik için yazı boyutunu küçültme */
+    #data_table, .alert, h2 {
+        font-size: 0.9rem; /* Genel yazı boyutunu küçült */
+    }
+    h2 {
+        font-size: 1.5rem !important; /* Başlığı çok küçültmemek için */
+    }
+
+    /* Tablo kapsayıcısını kenarlara yaslamak ve ortalamayı kaldırmak için: */
+    /* dataTables.bootstrap5.css zaten .dataTables_wrapper'ı tam genişlik yapar,
+       bu yüzden .container'daki varsayılan max-width'i aşan bir genişlik tanımlamıyoruz. 
+       .table-responsive içinde olduğu için taşınmaz. */
+
+    /* DataTables başlık ve altbilgi kutucuklarını da küçültmek için */
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_paginate {
+        font-size: 0.85rem;
     }
 </style>
 {% endblock %}
@@ -35,7 +56,7 @@
 <form method="POST" action="{{ url_for('table_view') }}">
     <div class="d-flex justify-content-between mb-3">
         <button type="submit" class="btn btn-success" {% if not template_set %}disabled{% endif %}>
-            <i class="bi bi-printer"></i> Seçilen {{ 'Satırları' if template_set else 'Satırları Seçin ve Şablonu Ayarlayın' }} Yazdırmaya Hazırla
+            <i class="bi bi-printer"></i> Seçilen {{ 'Satırları' if template_set else 'Satırları Seçin ve Yazdırın' }} Yazdırmaya Hazırla
         </button>
         <div id="colvis-container" class="btn-group"></div>
     </div>
