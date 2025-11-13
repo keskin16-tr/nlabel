@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Etiket Yazdırma Uygulaması{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    {% block head_extra %}{% endblock %}
+
+    <style>
+        /* Genel Stil: Etiket yazdırma görünümü için */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Etiket Kutusu Sınıfı (Yazdırılan her bir etiket) */
+            .etiket-kutu {
+                border: 1px dashed #ccc; /* Önizlemede daha yumuşak bir sınır */
+                padding: 5px;
+                width: 100mm; /* Örnek etiket genişliği */
+                min-height: 50mm;
+                margin-bottom: 10px;
+                page-break-inside: avoid; /* Sayfa sonuna gelince etiketi bölmez */
+            }
+            .label-cell {
+                padding: 2px !important;
+                border: 1px solid #333 !important;
+                /* Flexbox ortalama: app.py'de yapıldığı için burada sadece varsayılan tablo stili kalır */
+            }
+            /* QR kodlar için stil */
+            .label-cell img {
+                max-width: 100%;
+                height: auto;
+                display: block; /* Merkezleme için */
+            }
+        }
+        /* Geriye kalan kısımlar */
+        .preview-box {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark no-print">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('upload') }}">Etiket Uygulaması</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if session.get('logged_in') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'upload' %}active{% endif %}" href="{{ url_for('upload') }}">1. Dosya Yükle</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'table_view' %}active{% endif %}" href="{{ url_for('table_view') }}">2. Veri Tablosu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'template_design' %}active{% endif %}" href="{{ url_for('template_design') }}">3. Şablon Tasarla</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'print_preview' %}active{% endif %}" href="{{ url_for('print_preview') }}">4. Yazdır</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if session.get('logged_in') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Çıkış Yap</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Giriş Yap</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
