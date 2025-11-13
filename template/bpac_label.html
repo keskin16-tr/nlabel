@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}b-PAC Etiket Yazdırma{% endblock %}
+
+{% block head_extra %}
+<script src="{{ url_for('static', filename='bpac.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Brother b-PAC Etiket Yazdırma</h3>
+  <hr>
+
+  <div id="bpac_status" class="alert alert-warning">
+    b-PAC eklentisi kontrol ediliyor...
+  </div>
+
+  <div class="form-group mt-3">
+    <label for="filePath">Etiket Şablonu (.lbx) Dosya Yolu:</label>
+    <input type="text" id="filePath" class="form-control" placeholder="C:\\etiket\\template.lbx">
+  </div>
+
+  <button id="btnCheck" class="btn btn-info mt-3">Eklentiyi Kontrol Et</button>
+  <button id="btnPrint" class="btn btn-success mt-3">Verileri Yazdır</button>
+
+  <div class="mt-4">
+    <h5>Veri Önizleme ({{ columns|length }} sütun)</h5>
+    <pre id="previewBox" style="background:#f8f9fa; padding:10px; border-radius:8px; max-height:300px; overflow:auto;"></pre>
+  </div>
+</div>
+
+<script>
+const dfRecords = {{ data_json|safe }};
+const statusDiv = document.getElementById('bpac_status');
+const previewBox = document.getElementById('previewBox');
+const filePathInput = document.getElementById('filePath');
+
+// --- 1️⃣ Önizleme ---
+previewBox.innerText = JSON.stringify(dfRecords.slice(0, 5), null, 2);
+
+// --- 2️⃣ b-PAC kontrolü ---
+const checkExtension = () => {
+  if (IsExtensionInstalled()) {
+    statusDiv.className = 'alert alert-success';
+    statusDiv.innerText = 'b-PAC eklentisi yüklü ✅';
+    return true;
+  } else {
+    statusDiv.className = 'alert alert-danger';
+    statusDiv.innerHTML = 'b-PAC eklentisi bulunamadı ❌<br>' +
+      'Lütfen Brother b-PAC Extension\'ı yükleyin.';
+    return false;
+  }
+};
+document.getElementById('btnCheck').addEventListener('click', checkExtension);
+
+// --- 3️⃣ Yazdırma ---
+document.getElementById('btnPrint').addEventListener('click', async () => {
+  if (!checkExtension()) return;
+  const filePath = filePathInput.value.trim();
+  if (!filePath) { alert("Lütfen .lbx dosya yolunu girin."); return; }
+
+  try {
+    const opened = await IDocument.Open(filePath);
+    if (!opened) { alert("Etiket dosyası açılamadı ❌"); return; }
+
+    const objCount = await IDocument.GetObjectsCount();
+    console.log("Etiketteki nesne sayısı:", objCount);
+
+    // Her satır için yazdırma
+    for (const row of dfRecords) {
+      // Tüm alanları sırayla set et
+      for (const key of Object.keys(row)) {
+        try {
+          const textIndex = await IDocument.GetTextIndex(key);
+          if (textIndex >= 0) {
+            await IDocument.SetText(textIndex, row[key]);
+          } else {
+            const barcodeIndex = await IDocument.GetBarcodeIndex(key);
+            if (barcodeIndex >= 0) {
+              await IDocument.SetBarcodeData(barcodeIndex, row[key]);
+            }
+          }
+        } catch (err) {
+          console.warn(`Alan ${key} bulunamadı:`, err);
+        }
+      }
+
+      // Yazdır
+      const ok = await IDocument.DoPrint(0, '');
+      console.log("Yazdırma sonucu:", ok);
+    }
+
+    await IDocument.Close();
+    alert("Tüm etiketler yazdırıldı ✅");
+  } catch (e) {
+    alert("Yazdırma hatası: " + e);
+  }
+});
+
+checkExtension();
+</script>
+{% endblock %}
