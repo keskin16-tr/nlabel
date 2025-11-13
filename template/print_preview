@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Yazdırma Önizlemesi{% endblock %}
+
+{% block head %}
+<style>
+    /* *** Yazdırma Kalitesini ve Tasarım Esnekliğini Artıran CSS Grid Tanımları *** */
+    
+    /* Etiketin ana kutusu: Dış kenarlık ve sayfa sonuna denk gelme kuralı */
+    .etiket-kutu { 
+        width: 100%; /* Sayfanın tamamını kapla */
+        border: 2px solid black; /* İstenen kalın dış kenarlık */
+        margin: 5px 0; /* Etiketler arası boşluk */
+        page-break-inside: avoid; /* Yazdırma sırasında etiketi ortadan bölme! */
+        display: flex; 
+        flex-direction: column; 
+    }
+    
+    /* Etiketin iç yapısı: 6 eşit sütunlu Grid */
+    .etiket-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* 6 eşit genişlikte sütun */
+        gap: 0; /* Hücreler arasında boşluk bırakma */
+        width: 100%;
+    }
+    
+    /* Tek bir hücrenin tanımı: Kenarlık, Birleştirme ve İçerik Hizalama */
+    .label-cell {
+        border: 1px solid #333; /* İnce hücre kenarlığı */
+        padding: 5px;
+        box-sizing: border-box; /* Padding ve border'ı genişliğe dahil et */
+        
+        /* İçeriği dikey ve yatayda ortalamak için */
+        display: flex;
+        align-items: center; /* Dikeyde ortala */
+        justify-content: center; /* Yatayda ortala */
+        text-align: center;
+        
+        overflow: hidden; /* Taşmayı önle */
+        /* Dinamik olarak app.py'dan gelen stil ayarları bu hücreye uygulanır */
+    }
+    
+    /* Yazdırma Medyası İçin Ayarlar (Tarayıcı menüsünden yazdırmayı etkinleştirir) */
+    @media print {
+        /* Yazdırırken sadece etiket kutularını göster */
+        body > *:not(.print-container) {
+            display: none !important;
+        }
+        
+        /* Etiket kutusu container'ını göster */
+        .print-container {
+            display: block !important;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        
+        /* Sayfa başlıkları, altbilgileri vb. gizle */
+        @page { 
+            margin: 0; /* Kenar boşluklarını sıfırla */
+        }
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>4. Yazdırma Önizlemesi</h2>
+    <button onclick="window.print()" class="btn btn-lg btn-danger">
+        <i class="bi bi-file-earmark-pdf-fill"></i> Yazdır / PDF Olarak Kaydet
+    </button>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="alert alert-info">
+    **ÖNEMLİ:** Lütfen tarayıcınızın yazdırma ayarlarından **Başlıklar ve Altbilgiler** (Headers and Footers) seçeneğini **KAPATIN** ve **Arka Plan Grafikleri** (Background Graphics) seçeneği **AÇIK** olduğundan emin olun.
+</div>
+
+<div class="print-container">
+    {{ labels | join('\n') | safe }}
+</div>
+
+<div class="mt-5 text-center">
+    <a href="{{ url_for('table_view') }}" class="btn btn-secondary me-2"><i class="bi bi-arrow-left"></i> Tabloya Geri Dön</a>
+    <button onclick="window.print()" class="btn btn-lg btn-danger"><i class="bi bi-file-earmark-pdf-fill"></i> Yazdır</button>
+</div>
+
+{% endblock %}
