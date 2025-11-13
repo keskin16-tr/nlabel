@@ -85,3 +85,43 @@ h2 {
         padding: 3px 8px;
     }
 }
+/* ZORLAYICI: justify-content-between'i tamamen iptal et ve tüm child'ları sola hizala */
+.d-flex.justify-content-between {
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+/* Eğer Bootstrap veya başka kural ortalıyor ise bunu da zorla */
+.d-flex.justify-content-between > * {
+    margin-left: 0 !important;
+    margin-right: 6px !important; /* butonlar arasında boşluk */
+    float: none !important;
+}
+
+/* colvis container kesinlikle sola */
+#colvis-container {
+    display: inline-flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    margin-left: 0 !important;
+    order: 0 !important; /* flex order ile yeniden konumlandır */
+}
+
+/* Yazdır butonunu da küçült ve sola yasla */
+.btn-success.btn-sm {
+    font-size: 0.8rem !important;
+    padding: 5px 10px !important;
+    margin-right: 6px !important;
+}
+
+/* colvis butonları küçük */
+#colvis-container .btn {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+}
+
+/* Eğer başka CSS ortalıyor ise header düzeyini artır */
+div.d-flex.justify-content-between.align-items-center.mb-3 {
+    justify-content: flex-start !important;
+}
