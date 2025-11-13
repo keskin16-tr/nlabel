@@ -22,14 +22,18 @@
 <div class="alert alert-info" role="alert">
     **Gelişmiş Filtreleme:** Artık her sütunun altındaki kutucuktan ayrı ayrı filtreleme yapabilirsiniz. Örneğin, 'Marka' sütununa 'Philips' yazıp filtreledikten sonra, 'Model' sütununa 'MX' yazıp sadece MX modellerini görebilirsiniz.
 </div>
-
 <form method="POST" action="{{ url_for('table_view') }}">
-    <div class="d-flex justify-content-between mb-3">
-        <button type="submit" class="btn btn-success" {% if not template_set %}disabled{% endif %}>
-            <i class="bi bi-printer"></i> Seçilen {{ 'Satırları' if template_set else 'Satırları Seçin ve Yazdırın' }} Yazdırmaya Hazırla
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <button type="submit" class="btn btn-success btn-sm" {% if not template_set %}disabled{% endif %}>
+            <i class="bi bi-printer"></i>
+            Seçilen {{ 'Satırları' if template_set else 'Satırları Seçin ve Yazdırın' }} Yazdırmaya Hazırla
         </button>
-        <div id="colvis-container" class="btn-group"></div>
     </div>
+    
+        <div id="colvis-container" class="btn-group"></div>
+</div>
+
 
     <div class="table-responsive">
         <table id="data_table" class="table table-striped table-hover table-sm" style="width:100%">
